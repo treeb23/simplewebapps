@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>写真で振り返る 思い出旅行マップ</title>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <link rel="stylesheet" href="main.css" type="text/css">
+</head>
+<body>
+  <h2>写真で振り返る 思い出旅行マップ</h2>
+
+  <div id="controls">
+    <button id="addMarkerBtn">マーカーを追加</button>
+    <input type="file" id="uploadPhotoBtn" accept="image/*" multiple>
+    <button id="registerBtn" disabled>登録</button>
+    <button id="resetBtn">リセット</button>
+    <button id="exportJsonBtn">JSON書き出し</button>
+    <button id="exportCsvBtn">CSV書き出し</button>
+    <input type="file" id="importFileBtn" style="display:none">
+    <button id="importBtn">インポート</button>
+    <button id="darkModeBtn">Dark Mode</button>
+  </div>
+
+  <div id="progress"></div>
+
+  <div id="container">
+    <!-- 左側: 地図 -->
+    <div id="map"></div>
+    <!-- 右側: サイドパネル -->
+    <div id="sidePanel">
+      <div id="photoDetail">写真を選択するとここに表示されます</div>
+      <div id="locationList"><h3>記録一覧</h3></div>
+    </div>
+  </div>
+
+  <!-- モーダル(拡大画像) -->
+  <div id="modal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <button class="close-btn" id="modalClose">×</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+  <script src="main.js" charset="utf-8"></script>
+</body>
+</html>

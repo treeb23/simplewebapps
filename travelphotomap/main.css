@@ -1,0 +1,130 @@
+/* ベースCSS */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: background 0.3s, color 0.3s;
+}
+h2 {
+    margin: 10px 0;
+}
+/* 通常モード */
+button, input {
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 8px;
+    border: none;
+    transition: background 0.3s;
+}
+button:disabled {
+    background: gray;
+    cursor: not-allowed;
+}
+#registerBtn { background: #28a745; color: white; }
+#resetBtn { background: #dc3545; color: white; }
+#exportJsonBtn { background: #007bff; color: white; }
+#exportCsvBtn { background: #ffc107; color: black; }
+#darkModeBtn { background: #666; color: white; }
+.edit-comment-btn { background: #555; color: white; }
+
+/* ダークモード用 */
+body.dark {
+    background: #222;
+    color: #eee;
+}
+/* ダークモード時はボタンの背景を薄いグレー、文字を濃い色に */
+body.dark button {
+    background: #ccc;
+    color: #222;
+}
+body.dark .edit-comment-btn {
+    background: #ddd;
+    color: #222;
+}
+/* 地図周辺・サイドパネル */
+#sidePanel { background: #f0f0f0; border-left: 1px solid #ccc; }
+body.dark #sidePanel { background: #333; border-left: 1px solid #444; }
+#photoDetail { background: #fff; border-bottom: 1px solid #ccc; }
+body.dark #photoDetail { background: #444; border-bottom: 1px solid #555; }
+#locationList { background-color: #f9f9f9; }
+body.dark #locationList { background: #333; }
+#progress { color: #444; }
+body.dark #progress { color: #ccc; }
+
+/* 上部のコントロール */
+#controls {
+    display: flex;
+    gap: 10px;
+    margin: 10px;
+}
+
+/* メインコンテナ (左:地図2/3, 右:パネル1/3) */
+#container {
+    display: flex;
+    width: 100%;
+    height: 80vh;
+}
+#map { width: 66.6667%; height: 100%; }
+#sidePanel { width: 33.3333%; display: flex; flex-direction: column; box-sizing: border-box; }
+
+/* 上部写真詳細 / 下部リスト */
+#photoDetail {
+    flex: 0 0 400px;
+    overflow-y: auto;
+    padding: 10px;
+    box-sizing: border-box;
+}
+#locationList { flex: 1; overflow-y: auto; padding: 10px; }
+
+/* モーダル(写真拡大) */
+.modal {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999;
+}
+.modal-content {
+    background: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+    overflow: auto;
+}
+.modal-content img {
+    max-width: 100%;
+    max-height: 80vh;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+.close-btn {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: #aaa;
+    color: white;
+    font-size: 18px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 32px; height: 32px;
+}
+
+/* サイドパネルのグループ一覧（階層化せず1行表示） */
+.group-item {
+    cursor: pointer;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.group-item button { margin-left: 5px; font-size: 12px; padding: 4px 8px; }

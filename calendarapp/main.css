@@ -1,0 +1,271 @@
+/* 基本スタイル */
+html, body {
+    height: 100%;
+    margin: 0;
+}
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #cea3ff;
+    display: flex;
+    flex-direction: column;
+}
+/* ヘッダー：タイトル＋右側に通知とナビゲーション */
+header {
+    background-color: #1a213b;
+    padding: 0.8rem 1rem;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+header h1 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+/* 通知アイコン */
+.header-right button#notify-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+/* ナビゲーション（ヘッダー内に常設） */
+nav#nav-bar {
+    display: flex;
+    gap: 0.5rem;
+}
+nav#nav-bar button {
+    background-color: #4c53af;
+    border: none;
+    color: #fff;
+    padding: 0.5rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+nav#nav-bar button:hover {
+    background-color: #1f2f47;
+    transform: translateY(-1px);
+}
+nav#nav-bar button.active {
+    background-color: #0f0e21;
+    font-weight: bold;
+}
+/* メインコンテナ */
+.container {
+    flex: 1;
+    overflow: auto;
+    padding: 1rem;
+}
+.hidden {
+    display: none;
+}
+/* カレンダーグリッド */
+.calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    background-color: #eedeff;
+    max-height: calc(100vh - 150px);
+    overflow-y: auto;
+}
+/* 曜日ヘッダーセル */
+.calendar-cell.header-cell {
+    min-height: 20px;
+    padding: 0.2rem;
+    text-align: center;
+    font-weight: bold;
+}
+/* 日付セル */
+.calendar-cell.date-cell {
+    min-height: 120px;
+    padding: 0.3rem;
+    position: relative;
+    border: 0.1px solid #cea3ff;
+    cursor: pointer;
+    overflow: hidden;
+}
+.calendar-cell .date-number {
+    position: absolute;
+    top: 0.3rem;
+    left: 0.8rem;
+    font-size: 1.2rem;
+    color: #1a1818;
+}
+.event-container {
+    margin-top: 1rem;
+    max-height: 60px;
+    overflow-y: auto;
+}
+.event-badge {
+    display: block;
+    margin-top: 2px;
+    padding: 2px 4px;
+    border-radius: 4px;
+    cursor: pointer;
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.8rem;
+}
+/* テーブル */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+}
+table th, table td {
+    padding: 0.3rem;
+    border: 1px solid #f8faef;
+    text-align: left;
+}
+table th.sortable:hover {
+    background-color: #f0f0f0;
+    cursor: pointer;
+}
+/* ボタン共通スタイル */
+button {
+    background-color: #4d1456;
+    border: none;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    transition: background-color 0.3s, transform 0.2s;
+    cursor: pointer;
+}
+button:hover {
+    background-color: #c93cdf;
+    transform: translateY(-1px);
+}
+/* 削除ボタンは赤色に統一 */
+.delete-btn {
+    background-color: red !important;
+}
+/* モーダル */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+}
+.modal-content {
+    background-color: #fef0ff;
+    margin: 5% auto;
+    padding: 1rem;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 8px;
+    position: relative;
+}
+.modal-header {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+.modal-footer {
+    text-align: right;
+    margin-top: 1rem;
+}
+.modal-footer button {
+    margin-left: 0.5rem;
+}
+.close-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+input, select, textarea {
+    width: 100%;
+    padding: 0.4rem;
+    margin: 0.4rem 0;
+    box-sizing: border-box;
+    font-size: 0.9rem;
+    background-color: #ead8ff;
+    border-radius: 6px;
+}
+.search-area {
+    margin: 0.5rem 0;
+    display: flex;
+    gap: 0.5rem;
+}
+.search-area input {
+    flex: 1;
+}
+/* マップ用 */
+#map-container, #location-map {
+    height: 300px;
+}
+/* メモ用 */
+.memo-item {
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+    margin: 0.5rem 0;
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+.memo-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.memo-buttons {
+    display: flex;
+    gap: 0.3rem;
+}
+/* Settings 用 */
+.settings-section {
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+.settings-section h4 {
+    margin-top: 0;
+}
+/* カレンダー上部の年月表示 */
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+.calendar-header h2 {
+    margin: 0;
+    font-size: 1rem;
+}
+/* 使い方画面 */
+#view-usage {
+    padding: 1rem;
+    font-size: 0.9rem;
+}
+#usage-search {
+    margin-bottom: 0.5rem;
+    display: flex;
+    gap: 0.5rem;
+}
+#usage-search input {
+    flex: 1;
+    padding: 0.4rem;
+    font-size: 0.9rem;
+}
+#usage-content p {
+    margin: 0.5rem 0;
+}

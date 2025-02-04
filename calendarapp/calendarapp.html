@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Simple Calendar</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700" rel="stylesheet">
+<!-- Leaflet CSS/JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<link rel="stylesheet" href="main.css" type="text/css">
+</head>
+<body>
+<!-- ヘッダー：タイトル＋右側に通知アイコンとナビゲーション -->
+<header>
+    <h1>Simple Calendar</h1>
+    <div class="header-right">
+    <button id="notify-btn" title="お知らせ" style="font-size: small;">お知らせ</button>
+    <nav id="nav-bar">
+        <button id="tab-calendar" class="active">カレンダー表示</button>
+        <button id="tab-event-list">予定一覧</button>
+        <button id="tab-memo">メモ帳</button>
+        <button id="tab-settings">設定</button>
+        <button id="tab-usage">使い方</button>
+    </nav>
+    </div>
+</header>
+<!-- メインコンテナ -->
+<div class="container" id="main-container">
+    <!-- カレンダー画面 -->
+    <div id="view-calendar">
+    <div class="calendar-header">
+        <button id="prev-month">&lt;</button>
+        <h2 id="calendar-title"></h2>
+        <button id="next-month">&gt;</button>
+    </div>
+    <div class="calendar" id="calendar-grid">
+        <!-- セルは JS で生成 -->
+    </div>
+    </div>
+    <!-- 予定一覧画面 -->
+    <div id="view-event-list" class="hidden">
+    <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom:0.5rem;">
+        <button id="new-event-btn">予定追加</button>
+        <button id="manage-tags-btn">タグ管理</button>
+        <div class="search-area">
+        <input type="text" id="search-keyword" placeholder="キーワード検索">
+        <button id="search-btn">検索</button>
+        <button id="clear-search-btn">クリア</button>
+        </div>
+    </div>
+    <!-- 追加：終了済み非表示ボタン -->
+    <div style="margin-bottom: 0.5rem;">
+        <button id="toggle-hide-completed">終了済み非表示</button>
+    </div>
+    <div style="margin: 0.5rem 0;">
+        <button id="sort-date-btn">日付順に並べ替え</button>
+        <button id="sort-priority-btn">優先度順に並べ替え</button>
+    </div>
+    <table id="event-table">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>日付</th>
+            <th>時間</th>
+            <th>タイトル</th>
+            <th>優先度</th>
+            <th>詳細</th>
+            <th>関連</th>
+            <th>色</th>
+            <th>タグ</th>
+            <th>場所</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- 予定行は JS で挿入 -->
+        </tbody>
+    </table>
+    </div>
+    <!-- メモ画面 -->
+    <div id="view-memo" class="hidden">
+    <h3>メモ</h3>
+    <div id="memo-list"></div>
+    <h4>新規メモ</h4>
+    <textarea id="new-memo-text" rows="3" placeholder="メモを記入してください"></textarea>
+    <button id="add-memo-btn">追加</button>
+    </div>
+    <!-- 設定画面 -->
+    <div id="view-settings" class="hidden">
+    <div class="settings-section">
+        <h4>カレンダー表示デフォルト設定</h4>
+        <div>
+        <label>優先度[高] フォントサイズ</label>
+        <input type="text" id="setting-high-font" value="1.2em">
+        </div>
+        <div>
+        <label>優先度[高] バッジ色</label>
+        <input type="color" id="setting-high-color" value="#ff0000">
+        </div>
+        <div>
+        <label>優先度[中] フォントサイズ</label>
+        <input type="text" id="setting-medium-font" value="1em">
+        </div>
+        <div>
+        <label>優先度[中] バッジ色</label>
+        <input type="color" id="setting-medium-color" value="#4CAF50">
+        </div>
+        <div>
+        <label>優先度[低] フォントサイズ</label>
+        <input type="text" id="setting-low-font" value="0.8em">
+        </div>
+        <div>
+        <label>優先度[低] バッジ色</label>
+        <input type="color" id="setting-low-color" value="#0000ff">
+        </div>
+        <button id="save-display-settings-btn">設定を保存</button>
+    </div>
+    <div class="settings-section">
+        <h4>データのインポート/エクスポート</h4>
+        <button id="export-csv-btn">エクスポート</button>
+        <input type="file" id="import-csv-input" accept=".csv" style="display:none;">
+        <button id="import-csv-btn">インポート</button>
+    </div>
+    </div>
+    <!-- 使い方画面 -->
+    <div id="view-usage" class="hidden">
+    <h3>使い方</h3>
+    <div id="usage-search">
+        <input type="text" id="usage-search-input" placeholder="ページ内検索">
+        <button id="usage-search-btn">検索</button>
+    </div>
+    <div id="usage-content">
+        <p><strong>予定の追加方法:</strong><br>
+        「カレンダー表示」でダブルクリックまたは「予定一覧」画面で「予定追加」ボタンをクリックし、予定追加モーダルに必要な情報（タイトル、日付、時間、優先度、関連予定、タグ、場所など）を入力してください。</p>
+        <p><strong>予定の編集方法:</strong><br>
+        既存の予定のバッジまたは「予定一覧」内の「編集」ボタンをクリックし、予定編集モーダルで情報を変更してください。</p>
+        <p><strong>インポート/エクスポート方法:</strong><br>
+        「設定」画面内の「データのインポート/エクスポート」セクションでエクスポートボタンを押すと CSVファイルがダウンロードされ、インポートボタンで CSVファイルを読み込むことができます。表示設定も含まれます。</p>
+        <p><strong>メモ欄について:</strong><br>
+        「メモ」画面で複数のメモを追加・編集・削除できます。各メモの編集・削除ボタンは右端に配置されています。</p>
+        <p><strong>タグ管理:</strong><br>
+        予定一覧画面で「タグ管理」ボタンをクリックすると、タグの追加・削除が可能です。</p>
+        <p><strong>場所の設定:</strong><br>
+        予定追加／編集モーダルで「位置設定／編集」ボタンをクリックすると、地図モーダルが開き、マップ上をクリックまたはドラッグしてピンを設置し、座標情報が保存されます。保存された座標は予定一覧や編集画面に表示され、クリックすると「位置確認マップ」モーダルが開きます。リロードボタンで再描画も可能です。</p>
+        <p><strong>通知機能:</strong><br>
+        ヘッダーの🔔アイコンをクリックすると、本日の予定（優先度順）、設定変更履歴、インポート/エクスポート履歴が表示されます。</p>
+    </div>
+    </div>
+</div>
+
+<!-- 各種モーダル -->
+<!-- 予定追加／編集モーダル -->
+<div id="event-modal" class="modal">
+    <div class="modal-content">
+    <span class="close-btn" id="cancel-event-btn">&times;</span>
+    <div class="modal-header" id="modal-title">予定の追加</div>
+    <div class="modal-body">
+        <input type="hidden" id="event-id">
+        <label>タイトル</label>
+        <input type="text" id="event-title">
+        <label>日付</label>
+        <input type="date" id="event-date">
+        <label>開始時刻</label>
+        <input type="time" id="event-start-time">
+        <label>終了時刻</label>
+        <input type="time" id="event-end-time">
+        <label>詳細</label>
+        <textarea id="event-description" rows="3"></textarea>
+        <label>優先度</label>
+        <select id="event-priority">
+        <option value="High">高</option>
+        <option value="Medium" selected>中</option>
+        <option value="Low">低</option>
+        </select>
+        <label>関連予定 (カンマ区切り)</label>
+        <div style="display:flex; gap:0.5rem;">
+        <input type="text" id="event-related" placeholder="例: 1623456789012,1623456789023">
+        <button id="search-related-btn" type="button">関連検索</button>
+        </div>
+        <label>色</label>
+        <input type="color" id="event-color" value="#4CAF50">
+        <label>タグ (Ctrlキーで複数選択)</label>
+        <select id="event-tags" multiple></select>
+        <label>場所</label>
+        <div style="display: flex; align-items: center; gap:0.5rem;">
+        <span id="location-display" style="font-size:0.9rem; color:#555;">未設定</span>
+        <button id="set-location-btn" type="button">位置設定／編集</button>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button id="save-event-btn">保存</button>
+    </div>
+    </div>
+</div>
+
+<!-- Location 選択モーダル -->
+<div id="location-modal" class="modal">
+    <div class="modal-content">
+    <span class="close-btn" id="close-location-btn">&times;</span>
+    <div class="modal-header">位置の選択／編集</div>
+    <div id="location-map"></div>
+    <div class="modal-footer">
+        <button id="reload-location-btn">リロード</button>
+        <button id="confirm-location-btn">確定</button>
+    </div>
+    </div>
+</div>
+
+<!-- 関連予定検索モーダル -->
+<div id="related-search-modal" class="modal">
+    <div class="modal-content">
+    <span class="close-btn" id="close-related-search-btn">&times;</span>
+    <div class="modal-header">関連予定の検索</div>
+    <div class="modal-body">
+        <input type="text" id="related-search-keyword" placeholder="キーワードを入力">
+        <button id="do-related-search-btn">検索</button>
+        <ul id="related-search-results" style="list-style: none; padding:0;"></ul>
+    </div>
+    </div>
+</div>
+
+<!-- 位置確認マップモーダル -->
+<div id="map-modal" class="modal">
+    <div class="modal-content">
+    <span class="close-btn" id="close-map-btn">&times;</span>
+    <div class="modal-header">位置確認マップ</div>
+    <div id="map-container"></div>
+    <div class="modal-footer">
+        <button id="reload-map-btn">リロード</button>
+    </div>
+    </div>
+</div>
+
+<!-- 関連予定詳細モーダル -->
+<div id="related-detail-modal" class="modal">
+    <div class="modal-content">
+    <span class="close-btn" id="close-related-detail-btn">&times;</span>
+    <div class="modal-header">予定の詳細</div>
+    <div class="modal-body" id="related-detail-body"></div>
+    </div>
+</div>
+
+<!-- タグ管理モーダル -->
+<div id="tag-modal" class="modal">
+    <div class="modal-content">
+    <span class="close-btn" id="close-tag-btn">&times;</span>
+    <div class="modal-header">タグ管理</div>
+    <div class="modal-body">
+        <ul id="tag-list" style="list-style: none; padding:0;"></ul>
+        <input type="text" id="new-tag-input" placeholder="新しいタグを入力">
+        <button id="add-tag-btn">追加</button>
+    </div>
+    </div>
+</div>
+
+<!-- 通知モーダル -->
+<div id="notify-modal" class="modal">
+    <div class="modal-content">
+    <span class="close-btn" id="close-notify-btn">&times;</span>
+    <div class="modal-header">お知らせ</div>
+    <div class="modal-body">
+        <h4>本日の予定 (優先度順)</h4>
+        <ul id="today-events" style="list-style: none; padding:0;"></ul>
+        <h4>設定変更履歴</h4>
+        <ul id="settings-history" style="list-style: none; padding:0;"></ul>
+        <h4>インポート/エクスポート履歴</h4>
+        <ul id="data-history" style="list-style: none; padding:0;"></ul>
+    </div>
+    </div>
+</div>
+<script src="main.js"></script>
+</body>
+</html>
