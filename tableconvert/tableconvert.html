@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>表変換ツール (csv,md,html)</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"> <!-- Bootstrap 5 CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"><!-- Bootstrap Icons -->
+  <style>
+    body { padding-top: 60px; }
+    .output-area {
+      white-space: pre-wrap;
+      background-color: #f8f9fa;
+      padding: 1rem;
+      border: 1px solid #ced4da;
+      border-radius: .25rem;
+      margin-bottom: 1rem;
+    }
+    .preview-frame {
+      border: 1px solid #ced4da;
+      padding: 1rem;
+      border-radius: .25rem;
+      margin-bottom: 1rem;
+      background-color: #fff;
+    }
+    .copy-btn {
+      font-size: 0.8rem;
+      margin-left: 0.5rem;
+      position: relative;
+    }
+    .copy-feedback {
+      font-size: 0.75rem;
+      color: #28a745;
+      margin-left: 0.3rem;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .copy-feedback.show {
+      opacity: 1;
+    }
+    /* 表エディタ用のスタイル */
+    .table-editor-controls button {
+      margin-right: 0.5rem;
+    }
+    .table-editor table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .table-editor th,
+    .table-editor td {
+      border: 1px solid #ced4da;
+      padding: 0.5rem;
+      text-align: center;
+    }
+    .table-editor th {
+      background-color: #e9ecef;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">表変換ツール</a>
+    </div>
+  </nav>
+
+  <div class="container my-4">
+    <ul class="nav nav-tabs" id="conversionTabs" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="excel-tab" data-bs-toggle="tab" data-bs-target="#excel" type="button" role="tab">Excel</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="markdown-tab" data-bs-toggle="tab" data-bs-target="#markdown" type="button" role="tab">Markdown</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="html-tab" data-bs-toggle="tab" data-bs-target="#html" type="button" role="tab">HTML</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="tableEditor-tab" data-bs-toggle="tab" data-bs-target="#tableEditor" type="button" role="tab">表エディタ</button>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="conversionTabsContent">
+      <div class="tab-pane fade show active p-3" id="excel" role="tabpanel">
+        <h5>Excelファイルのアップロード</h5>
+        <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" class="form-control mb-3">
+        <div class="mb-3">
+          <label for="inputEncodingExcel" class="form-label">入力ファイルの文字コード:</label>
+          <select id="inputEncodingExcel" class="form-select w-auto">
+            <option value="auto" selected>自動判定</option>
+            <option value="utf-8">UTF-8</option>
+            <option value="shift_jis">Shift_JIS</option>
+            <option value="euc-jp">EUC-JP</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="encodingSelectExcel" class="form-label">出力文字コード:</label>
+          <select id="encodingSelectExcel" class="form-select w-auto">
+            <option value="utf8" selected>UTF-8</option>
+            <option value="sjis">Shift_JIS</option>
+            <option value="eucjp">EUC-JP</option>
+          </select>
+        </div>
+
+        <button id="convertExcel" class="btn btn-primary mb-3">変換実行</button>
+        <button id="downloadMarkdown" class="btn btn-secondary mb-3">Markdownをダウンロード</button>
+        <hr>
+        <h5>変換結果</h5>
+        <div id="excelOutput"></div>
+      </div>
+
+      <div class="tab-pane fade p-3" id="markdown" role="tabpanel">
+        <h5>Markdownテーブル入力</h5>
+        <textarea id="markdownInput" rows="8" class="form-control mb-3" placeholder="例:
+| Header1 | Header2 |
+| ------- | ------- |
+| Data1   | Data2   |"></textarea>
+        <div class="mb-3">
+          <label for="encodingSelectMd" class="form-label">出力文字コード:</label>
+          <select id="encodingSelectMd" class="form-select w-auto">
+            <option value="utf8" selected>UTF-8</option>
+            <option value="sjis">Shift_JIS</option>
+            <option value="eucjp">EUC-JP</option>
+          </select>
+        </div>
+        <button id="convertMarkdown" class="btn btn-primary">変換実行</button>
+        <hr>
+        <h5>変換結果</h5>
+        <div id="markdownOutput"></div>
+      </div>
+      <div class="tab-pane fade p-3" id="html" role="tabpanel">
+        <h5>HTMLテーブル入力</h5>
+        <textarea id="htmlInput" rows="8" class="form-control mb-3" placeholder="例:
+<table>
+  <tr><th>Header1</th><th>Header2</th></tr>
+  <tr><td>Data1</td><td>Data2</td></tr>
+</table>"></textarea>
+        <div class="mb-3">
+          <label for="encodingSelectHtml" class="form-label">出力文字コード:</label>
+          <select id="encodingSelectHtml" class="form-select w-auto">
+            <option value="utf8" selected>UTF-8</option>
+            <option value="sjis">Shift_JIS</option>
+            <option value="eucjp">EUC-JP</option>
+          </select>
+        </div>
+        <button id="convertHTML" class="btn btn-primary">変換実行</button>
+        <hr>
+        <h5>変換結果</h5>
+        <div id="htmlOutput"></div>
+      </div>
+      <div class="tab-pane fade p-3" id="tableEditor" role="tabpanel">
+        <h5>表エディタ</h5>
+        <div class="table-editor-controls mb-2">
+          <button id="addRow" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-plus-circle"></i> 行追加
+          </button>
+          <button id="delRow" class="btn btn-sm btn-outline-danger">
+            <i class="bi bi-dash-circle"></i> 行削除
+          </button>
+          <button id="addCol" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-plus-circle"></i> 列追加
+          </button>
+          <button id="delCol" class="btn btn-sm btn-outline-danger">
+            <i class="bi bi-dash-circle"></i> 列削除
+          </button>
+        </div>
+        <div class="table-editor mb-3" id="tableEditorPreview">
+          <table>
+            <thead>
+              <tr>
+                <th contenteditable="true">Header1</th>
+                <th contenteditable="true">Header2</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td contenteditable="true">Data1</td>
+                <td contenteditable="true">Data2</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <h6>Markdown形式</h6>
+          <div class="output-area">
+            <div>
+              <button class="btn btn-sm btn-outline-secondary copy-btn" onclick="copyToClipboard('tableEditorMarkdown', this)">
+                <i class="bi bi-clipboard"></i>
+              </button>
+            </div>
+            <pre id="tableEditorMarkdown"></pre>
+          </div>
+          <h6>CSV形式</h6>
+          <div class="output-area">
+            <div>
+              <button class="btn btn-sm btn-outline-secondary copy-btn" onclick="copyToClipboard('tableEditorCSV', this)">
+                <i class="bi bi-clipboard"></i>
+              </button>
+            </div>
+            <pre id="tableEditorCSV"></pre>
+          </div>
+          <h6>HTML形式</h6>
+          <div class="output-area">
+            <div>
+              <button class="btn btn-sm btn-outline-secondary copy-btn" onclick="copyToClipboard('tableEditorHTML', this)">
+                <i class="bi bi-clipboard"></i>
+              </button>
+            </div>
+            <pre id="tableEditorHTML"></pre>
+          </div>
+          <div class="preview-frame">
+            <strong>HTML形式 (プレビュー):</strong>
+            <div id="tableEditorHTMLPreview"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+  <script src="https://unpkg.com/encoding-japanese@2.2.0/encoding.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="./tableconvert.js"></script>
+</body>
+</html>
