@@ -91,7 +91,7 @@
 
 ## Simple Web Calendar
 
-<img src="calendarapp/img/main_image.gif" alt="概要">
+<img src="calendarapp/img/tableview.png" alt="基本画面">
 
 <details><summary>詳細</summary>
 
